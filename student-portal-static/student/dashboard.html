@@ -35,7 +35,7 @@
                 </div>
             </header>
 
-            <div class="grid grid-2">
+            <div class="grid grid-3">
                 <div class="card">
                     <h3>Academic Profile</h3>
                     <div class="mt-4">
@@ -44,14 +44,23 @@
                         <p><strong>Semester:</strong> <span id="sem">-</span></p>
                     </div>
                 </div>
+
                 <div class="card">
-                    <h3>Attendance Summary</h3>
+                    <h3>Login Details</h3>
+                    <div class="mt-4">
+                        <p><strong>Username:</strong> <span id="uName"></span></p>
+                        <p><strong>Password:</strong> <span id="uPass"></span></p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Total Attendance</h3>
                     <div style="text-align: center; margin-top: 10px;">
                         <div id="attendanceCircle"
                             style="width: 100px; height: 100px; border-radius: 50%; border: 10px solid var(--primary-color); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 1.5rem; font-weight: bold;">
                             0%
                         </div>
-                        <p class="mt-4">Overall Attendance</p>
+                        <p class="mt-4">Till Date</p>
                     </div>
                 </div>
             </div>
@@ -70,6 +79,9 @@
         const db = DB.get();
         const student = db.students.find(s => s.id === user.studentId);
 
+        // Find user credential record
+        const currentUser = db.users.find(u => u.studentId === user.studentId);
+
         if (student) {
             document.getElementById('studentName').textContent = student.name;
             document.getElementById('profilePic').src = student.photo || 'https://via.placeholder.com/40';
@@ -77,9 +89,20 @@
             document.getElementById('rollNo').textContent = student.rollNo;
             document.getElementById('dept').textContent = student.department;
             document.getElementById('sem').textContent = student.semester;
-
-            document.getElementById('attendanceCircle').textContent = student.attendance + '%';
         }
+
+        if (currentUser) {
+            document.getElementById('uName').textContent = currentUser.username;
+            document.getElementById('uPass').textContent = currentUser.password;
+        }
+
+        // Calculate Real Attendance
+        const records = db.attendanceRecords.filter(r => r.studentId === user.studentId);
+        const total = records.length;
+        const present = records.filter(r => r.status === 'Present').length;
+        const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+
+        document.getElementById('attendanceCircle').textContent = percentage + '%';
     </script>
 </body>
 

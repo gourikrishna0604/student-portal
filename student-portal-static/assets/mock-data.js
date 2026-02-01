@@ -1,7 +1,9 @@
 const MOCK_DATA = {
+    version: 3,
     users: [
         { id: 1, username: 'admin', password: 'password', role: 'admin', name: 'Admin User' },
-        { id: 2, username: 'student', password: 'password', role: 'student', studentId: 101, name: 'Gouri Krishna' }
+        { id: 2, username: 'student', password: 'password', role: 'student', studentId: 101, name: 'Gouri Krishna' },
+        { id: 3, username: 'John Doe', password: 'password', role: 'student', studentId: 102, name: 'John Doe' }
     ],
     students: [
         {
@@ -15,7 +17,7 @@ const MOCK_DATA = {
             address: '123 College Road, City',
             photo: 'https://via.placeholder.com/150',
             fees: { total: 50000, paid: 30000, due: 20000 },
-            attendance: 85 // %
+            attendance: 75
         },
         {
             id: 102,
@@ -32,8 +34,11 @@ const MOCK_DATA = {
         }
     ],
     attendanceRecords: [
-        { date: '2026-02-01', studentId: 101, status: 'Present' },
-        { date: '2026-02-01', studentId: 102, status: 'Absent' }
+        { date: '2026-01-20', studentId: 101, status: 'Present' },
+        { date: '2026-01-21', studentId: 101, status: 'Present' },
+        { date: '2026-01-22', studentId: 101, status: 'Absent' },
+        { date: '2026-01-23', studentId: 101, status: 'Present' },
+        { date: '2026-02-01', studentId: 102, status: 'Present' }
     ],
     timetable: [
         { day: 'Monday', subject: 'Data Structures', time: '10:00 AM' },
@@ -43,5 +48,6 @@ const MOCK_DATA = {
     results: [
         { studentId: 101, semester: '5th', sgpa: 8.5, link: '#' },
         { studentId: 102, semester: '5th', sgpa: 7.2, link: '#' }
-    ]
+    ],
+    supplementary: []
 };

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Student Portal</title>
     <link rel="stylesheet" href="assets/styles.css">
 </head>
+
 <body>
     <div class="auth-wrapper">
         <div class="login-card">
@@ -14,7 +16,7 @@
                 <h2>Student Portal</h2>
                 <p>Please sign in to continue</p>
             </div>
-            
+
             <form id="loginForm">
                 <div class="form-group">
                     <label>Username</label>
@@ -24,7 +26,8 @@
                     <label>Password</label>
                     <input type="password" id="password" class="form-control" placeholder="Enter password" required>
                 </div>
-                <div id="errorMsg" style="color: var(--danger); display: none; margin-bottom: 10px;">Invalid credentials</div>
+                <div id="errorMsg" style="color: var(--danger); display: none; margin-bottom: 10px;">Invalid credentials
+                </div>
                 <button type="submit" class="btn" style="width: 100%;">Login</button>
             </form>
 
@@ -39,13 +42,13 @@
     <script src="assets/mock-data.js"></script>
     <script src="assets/script.js"></script>
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
             e.preventDefault();
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
-            
+
             const loggedInUser = Auth.login(user, pass);
-            
+
             if (loggedInUser) {
                 if (loggedInUser.role === 'admin') {
                     window.location.href = 'admin/dashboard.html';
@@ -58,4 +61,5 @@
         });
     </script>
 </body>
+
 </html>

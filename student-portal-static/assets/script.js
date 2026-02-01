@@ -4,9 +4,15 @@ const SESSION_KEY = 'studentPortal_session';
 
 const DB = {
     init: function () {
-        if (!localStorage.getItem(DB_KEY) && typeof MOCK_DATA !== 'undefined') {
-            localStorage.setItem(DB_KEY, JSON.stringify(MOCK_DATA));
-            console.log('Database initialized with mock data');
+        const existing = localStorage.getItem(DB_KEY);
+        let data = existing ? JSON.parse(existing) : null;
+
+        if (typeof MOCK_DATA !== 'undefined') {
+            // Check for version update or first load
+            if (!data || (MOCK_DATA.version && (!data.version || data.version < MOCK_DATA.version))) {
+                localStorage.setItem(DB_KEY, JSON.stringify(MOCK_DATA));
+                console.log('Database updated to version ' + MOCK_DATA.version);
+            }
         }
     },
     get: function () {
@@ -23,7 +29,6 @@ const DB = {
         if (index >= 0) {
             data[collection][index] = item;
         } else {
-            // Auto-increment ID if not present (simple logic)
             if (!item.id) item.id = Date.now();
             data[collection].push(item);
         }
