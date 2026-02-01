@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - Admin</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>🎓 Admin Portal</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="students.html">Manage Students</a>
+                <a href="attendance.html">Attendance</a>
+                <a href="results.html" class="active">Results & Marksheets</a>
+                <a href="#" onclick="Auth.logout()">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2>Manage Results</h2>
+
+            <div class="card mb-4" style="max-width: 600px;">
+                <h3>Upload Result</h3>
+                <form id="resultForm">
+                    <div class="form-group">
+                        <label>Student Roll No</label>
+                        <select id="studentSelect" class="form-control" required>
+                            <!-- Options -->
+                        </select>
+                    </div>
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label>Semester</label>
+                            <select id="sem" class="form-control">
+                                <option>1st</option>
+                                <option>2nd</option>
+                                <option>3rd</option>
+                                <option>4th</option>
+                                <option>5th</option>
+                                <option>6th</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>SGPA / Percentage</label>
+                            <input type="text" id="sgpa" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Marksheet PDF (Mock)</label>
+                        <input type="file" class="form-control">
+                    </div>
+                    <button type="submit" class="btn">Upload Result</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/script.js"></script>
+    <script>
+        Auth.requireRole('admin');
+        const db = DB.get();
+
+        const sel = document.getElementById('studentSelect');
+        db.students.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = s.rollNo + ' - ' + s.name;
+            sel.appendChild(opt);
+        });
+
+        document.getElementById('resultForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const sid = parseInt(document.getElementById('studentSelect').value);
+
+            const result = {
+                id: Date.now(),
+                studentId: sid,
+                semester: document.getElementById('sem').value,
+                sgpa: document.getElementById('sgpa').value,
+                link: '#' // Mock link
+            };
+
+            DB.update('results', result);
+            alert('Result Uploaded Successfully');
+            e.target.reset();
+        });
+    </script>
+</body>
+
+</html>

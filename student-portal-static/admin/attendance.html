@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Attendance - Admin</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>🎓 Admin Portal</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="students.html">Manage Students</a>
+                <a href="attendance.html" class="active">Attendance</a>
+                <a href="results.html">Results & Marksheets</a>
+                <a href="#" onclick="Auth.logout()">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2>Mark Attendance</h2>
+
+            <div class="card mb-4">
+                <div class="grid grid-3">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="attDate" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select id="filterDept" class="form-control" onchange="loadStudents()">
+                            <option value="">All</option>
+                            <option>Computer Science</option>
+                            <option>Electronics</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Roll No</th>
+                            <th>Name</th>
+                            <th>Status (Check for Present)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attList">
+                        <!-- List -->
+                    </tbody>
+                </table>
+                <button class="btn mt-4" onclick="saveAttendance()">Save Attendance</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/script.js"></script>
+    <script>
+        Auth.requireRole('admin');
+        const db = DB.get();
+
+        // Set today's date
+        document.getElementById('attDate').valueAsDate = new Date();
+
+        function loadStudents() {
+            const tbody = document.getElementById('attList');
+            tbody.innerHTML = '';
+            const dept = document.getElementById('filterDept').value;
+
+            db.students.forEach(s => {
+                if (dept && s.department !== dept) return;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${s.rollNo}</td>
+                    <td>${s.name}</td>
+                    <td>
+                        <input type="checkbox" class="att-checkbox" data-id="${s.id}" checked>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function saveAttendance() {
+            const date = document.getElementById('attDate').value;
+            const checkboxes = document.querySelectorAll('.att-checkbox');
+            const records = [];
+
+            if (!date) { alert('Please select a date'); return; }
+
+            checkboxes.forEach(cb => {
+                records.push({
+                    date: date,
+                    studentId: parseInt(cb.dataset.id),
+                    status: cb.checked ? 'Present' : 'Absent'
+                });
+            });
+
+            // In a real app we would update or append. Here we append.
+            const currentDb = DB.get();
+            currentDb.attendanceRecords = [...currentDb.attendanceRecords, ...records];
+
+            // Recalculate % for display (simplified)
+            records.forEach(r => {
+                const s = currentDb.students.find(st => st.id === r.studentId);
+                // Dummy update logic for %
+                s.attendance = s.attendance ? Math.min(100, s.attendance + (r.status === 'Present' ? 1 : -1)) : 75;
+            });
+
+            DB.save(currentDb);
+            alert('Attendance Saved Successfully');
+        }
+
+        loadStudents();
+    </script>
+</body>
+
+</html>

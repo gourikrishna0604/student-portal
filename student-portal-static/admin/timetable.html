@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable - Admin</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>🎓 Admin Portal</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="students.html">Manage Students</a>
+                <a href="attendance.html">Attendance</a>
+                <a href="results.html">Results & Marksheets</a>
+                <a href="timetable.html" class="active">Timetable</a>
+                <a href="#" onclick="Auth.logout()">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2>Manage Timetable</h2>
+
+            <div class="card mb-4" style="max-width: 600px;">
+                <h3>Add Class</h3>
+                <form id="ttForm">
+                    <div class="grid grid-3">
+                        <div class="form-group">
+                            <label>Day</label>
+                            <select id="day" class="form-control">
+                                <option>Monday</option>
+                                <option>Tuesday</option>
+                                <option>Wednesday</option>
+                                <option>Thursday</option>
+                                <option>Friday</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Time</label>
+                            <input type="time" id="time" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <input type="text" id="subject" class="form-control" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Add to Timetable</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Current Schedule</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Subject</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ttList"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/script.js"></script>
+    <script>
+        Auth.requireRole('admin');
+        const db = DB.get();
+
+        function render() {
+            const tbody = document.getElementById('ttList');
+            tbody.innerHTML = '';
+
+            // Re-fetch
+            const currentDb = DB.get();
+            currentDb.timetable.forEach((t, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${t.day}</td>
+                    <td>${t.time}</td>
+                    <td>${t.subject}</td>
+                    <td><button class="btn-outline" onclick="removeEntry(${idx})">Remove</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('ttForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const entry = {
+                day: document.getElementById('day').value,
+                time: document.getElementById('time').value,
+                subject: document.getElementById('subject').value
+            };
+
+            const currentDb = DB.get();
+            if (!currentDb.timetable) currentDb.timetable = [];
+            currentDb.timetable.push(entry);
+            DB.save(currentDb);
+            render();
+            e.target.reset();
+        });
+
+        function removeEntry(index) {
+            if (confirm('Delete this entry?')) {
+                const currentDb = DB.get();
+                currentDb.timetable.splice(index, 1);
+                DB.save(currentDb);
+                render();
+            }
+        }
+
+        render();
+    </script>
+</body>
+
+</html>

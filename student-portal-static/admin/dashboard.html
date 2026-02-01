@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Student Portal</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>🎓 Admin Portal</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="students.html">Manage Students</a>
+                <a href="attendance.html">Attendance</a>
+                <a href="results.html">Results & Marksheets</a>
+                <a href="timetable.html">Timetable</a>
+                <a href="supp.html">Supplementary</a>
+                <a href="#" onclick="Auth.logout()">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="flex justify-between items-center mb-4">
+                <h2>Dashboard Overview</h2>
+                <div id="adminName">Welcome, Admin</div>
+            </header>
+
+            <div class="grid grid-3">
+                <div class="card">
+                    <h3>Total Students</h3>
+                    <p id="totalStudents" style="font-size: 2rem; font-weight: bold; color: var(--primary-color);">0</p>
+                </div>
+                <div class="card">
+                    <h3>Avg Attendance</h3>
+                    <p id="avgAttendance" style="font-size: 2rem; font-weight: bold; color: var(--success);">0%</p>
+                </div>
+                <div class="card">
+                    <h3>Pending Fees</h3>
+                    <p id="pendingFees" style="font-size: 2rem; font-weight: bold; color: var(--danger);">0</p>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <h3>Recent Activities</h3>
+                <p>System initialized.</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/script.js"></script>
+    <script>
+        // Auth Check
+        Auth.requireRole('admin');
+
+        // Load Stats
+        const db = DB.get();
+        document.getElementById('totalStudents').textContent = db.students.length;
+
+        // Calculate Average Attendance
+        const totalAtt = db.students.reduce((acc, curr) => acc + (curr.attendance || 0), 0);
+        const avg = db.students.length ? Math.round(totalAtt / db.students.length) : 0;
+        document.getElementById('avgAttendance').textContent = avg + '%';
+
+        // Calculate Pending Fees
+        const totalDue = db.students.reduce((acc, curr) => acc + (curr.fees?.due || 0), 0);
+        document.getElementById('pendingFees').textContent = '₹' + totalDue.toLocaleString();
+    </script>
+</body>
+
+</html>

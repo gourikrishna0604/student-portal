@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Results - Student</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>🎓 Student Portal</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="view-attendance.html">My Attendance</a>
+                <a href="timetable.html">Timetable</a>
+                <a href="results.html" class="active">Results</a>
+                <a href="fees.html">Fees</a>
+                <a href="#" onclick="Auth.logout()">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2>Examination Results</h2>
+            <div class="grid grid-3" id="resultsGrid">
+                <!-- Cards -->
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/script.js"></script>
+    <script>
+        const user = Auth.requireRole('student');
+        const db = DB.get();
+        const results = db.results.filter(r => r.studentId === user.studentId);
+
+        const container = document.getElementById('resultsGrid');
+        if (results.length === 0) {
+            container.innerHTML = '<p>No results declared yet.</p>';
+        } else {
+            results.forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <h3>${r.semester} Semester</h3>
+                    <p class="mt-4" style="font-size: 1.2rem;">SGPA: <strong>${r.sgpa}</strong></p>
+                    <a href="${r.link}" class="btn mt-4" download>Download Marksheet</a>
+                `;
+                container.appendChild(div);
+            });
+        }
+    </script>
+</body>
+
+</html>

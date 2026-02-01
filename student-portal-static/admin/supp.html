@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplementary - Admin</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>🎓 Admin Portal</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="students.html">Manage Students</a>
+                <a href="attendance.html">Attendance</a>
+                <a href="supp.html" class="active">Supplementary</a>
+                <a href="#" onclick="Auth.logout()">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2>Supplementary Exam Status</h2>
+
+            <div class="card mb-4">
+                <h3>Add Supplementary Record</h3>
+                <form id="suppForm">
+                    <div class="grid grid-3">
+                        <div class="form-group">
+                            <label>Student</label>
+                            <select id="studentSelect" class="form-control"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <input type="text" id="subject" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="status" class="form-control">
+                                <option>Fee Pending</option>
+                                <option>Fee Paid</option>
+                                <option>Exam Scheduled</option>
+                                <option>Cleared</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Update Status</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Subject</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="suppList"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/script.js"></script>
+    <script>
+        Auth.requireRole('admin');
+        const db = DB.get();
+
+        // Populate students
+        const sel = document.getElementById('studentSelect');
+        db.students.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = s.rollNo + ' - ' + s.name;
+            sel.appendChild(opt);
+        });
+
+        function render() {
+            const tbody = document.getElementById('suppList');
+            tbody.innerHTML = '';
+
+            const currentDb = DB.get();
+            const list = currentDb.supplementary || [];
+
+            list.forEach(item => {
+                const s = currentDb.students.find(st => st.id === item.studentId);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${s ? s.name : 'Unknown'}</td>
+                    <td>${item.subject}</td>
+                    <td>${item.status}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('suppForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const entry = {
+                id: Date.now(),
+                studentId: parseInt(document.getElementById('studentSelect').value),
+                subject: document.getElementById('subject').value,
+                status: document.getElementById('status').value
+            };
+
+            const currentDb = DB.get();
+            if (!currentDb.supplementary) currentDb.supplementary = [];
+            currentDb.supplementary.push(entry);
+            DB.save(currentDb);
+            render();
+            alert('Status Updated');
+        });
+
+        render();
+    </script>
+</body>
+
+</html>

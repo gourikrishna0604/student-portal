@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable - Student</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>🎓 Student Portal</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="view-attendance.html">My Attendance</a>
+                <a href="timetable.html" class="active">Timetable</a>
+                <a href="results.html">Results</a>
+                <a href="fees.html">Fees</a>
+                <a href="#" onclick="Auth.logout()">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2>Weekly Timetable</h2>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Subject</th>
+                        </tr>
+                    </thead>
+                    <tbody id="timetableBody">
+                        <!-- Data -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="../assets/script.js"></script>
+    <script>
+        const user = Auth.requireRole('student');
+        const db = DB.get();
+        // Simplified: Showing global timetable. In real app, filter by dept/sem
+
+        const tbody = document.getElementById('timetableBody');
+        db.timetable.forEach(t => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${t.day}</td>
+                <td>${t.time}</td>
+                <td>${t.subject}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    </script>
+</body>
+
+</html>
